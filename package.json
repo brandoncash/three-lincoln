@@ -1,0 +1,16 @@
+{
+  "name": "three-lincoln",
+  "version": "1.0.0",
+  "description": "A model viewer built in THREEjs",
+  "main": "lincoln.js",
+  "scripts": {
+    "serve": "http-server .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "http-server": "^0.12.0",
+    "three": "^0.102.1"
+  }
+}
