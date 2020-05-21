@@ -17,6 +17,7 @@
 		<script src="build/three.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/math/SimplexNoise.js"></script>
 
 		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -37,13 +38,8 @@
         
 		<script src="js/controls/OrbitControls.js"></script>
 		
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-
 		<script src="js/geometries/DecalGeometry.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/tween.min.js"></script>
         <script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -94,8 +90,7 @@
 			uniform vec2 uvScale;
 			varying vec2 vUv;
 
-			void main()
-			{
+			void main() {
 				vUv = uvScale * uv;
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 				gl_Position = projectionMatrix * mvPosition;
@@ -103,32 +98,24 @@
 		</script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
-
 			uniform float time;
-
 			varying vec2 vUv;
 
-			void main( void ) {
-
+			void main(void) {
 				vec2 position = - 1.0 + 2.0 * vUv;
 
 				float red = abs( sin( position.x * position.y + time / 5.0 ) );
 				float green = abs( sin( position.x * position.y + time / 4.0 ) );
 				float blue = abs( sin( position.x * position.y + time / 3.0 ) );
 				gl_FragColor = vec4( red, green, blue, 1.0 );
-
 			}
-
 		</script>
 
 		<script id="fragment_shader3" type="x-shader/x-fragment">
-
 			uniform float time;
-
 			varying vec2 vUv;
-
-			void main( void ) {
-
+			
+			void main(void) {
 				vec2 position = vUv;
 
 				float color = 0.0;
@@ -138,20 +125,15 @@
 				color *= sin( time / 10.0 ) * 0.5;
 
 				gl_FragColor = vec4( vec3( color, color * 0.5, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
-
 			}
-
 		</script>
 
 		<script id="fragment_shader2" type="x-shader/x-fragment">
-
 			uniform float time;
-
 			uniform sampler2D texture;
-
 			varying vec2 vUv;
 
-			void main( void ) {
+			void main(void) {
 
 				vec2 position = - 1.0 + 2.0 * vUv;
 
@@ -167,18 +149,14 @@
 				vec3 color = texture2D( texture, uv ).rgb;
 
 				gl_FragColor = vec4( color * r * 1.5, 1.0 );
-
 			}
 		</script>
 
 		<script id="fragment_shader1" type="x-shader/x-fragment">
-
 			uniform float time;
-
 			varying vec2 vUv;
 
 			void main(void) {
-
 				vec2 p = - 1.0 + 2.0 * vUv;
 				float a = time * 40.0;
 				float d, e, f, g = 1.0 / 40.0 ,h ,i ,r ,q;
@@ -204,22 +182,17 @@
 				d += sin( d * d * 8.0 ) * 0.52;
 				f = ( sin( a * g ) + 1.0 ) / 2.0;
 				gl_FragColor = vec4( vec3( f * i / 1.6, i / 2.0 + d / 13.0, i ) * d * p.x + vec3( i / 1.3 + d / 8.0, i / 2.0 + d / 18.0, i ) * d * ( 1.0 - p.x ), 1.0 );
-
 			}
-
 		</script>
 
 		<script id="vertexShader2" type="x-shader/x-vertex">
-
 			varying vec2 vUv;
 
-			void main()
-			{
+			void main() {
 				vUv = uv;
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 				gl_Position = projectionMatrix * mvPosition;
 			}
-
 		</script>
 
 		<script src="lincoln.js"></script>

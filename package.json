@@ -4,13 +4,13 @@
   "description": "A model viewer built in THREEjs",
   "main": "lincoln.js",
   "scripts": {
-    "serve": "http-server .",
+    "serve": "serve .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "http-server": "^0.12.0",
+    "serve": "^11.3.0",
     "three": "^0.102.1"
   }
 }

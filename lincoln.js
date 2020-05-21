@@ -1,9 +1,5 @@
 'use strict';
 
-if (!Detector.webgl) {
-    Detector.addGetWebGLMessage();
-}
-
 var container, stats;
 
 var camera, cameraTarget, scene, renderer;
@@ -394,7 +390,7 @@ function init() {
     loadingManager.onLoad = () => {
         console.log('loadingManager complete');
 
-        // FIXME: this fires to often but needs to be somewhere(?) to init
+        // FIXME: this fires too often but needs to be somewhere(?) to init
         // statue = meshes[options.model.currentStatue + '-' + options.model.currentLod];
         // updateMaterial();
 
@@ -695,7 +691,6 @@ function loadTextures() {
         polygonOffsetFactor: - 4,
         wireframe: false
     });
-    
 }
 
 function loadTexture(texture, resolution) {
@@ -842,62 +837,45 @@ function initPostprocessing() {
     effectComposer.addPass(ssaoPass);
 }
 
+function createLight(light, name) {
+    light.color = new THREE.Color(options.lighting[name].color);
+    light.intensity = options.lighting[name].intensity;
+    light.angle = options.lighting[name].angle;
+    light.penumbra = options.lighting[name].penumbra;
+    light.decay = options.lighting[name].decay;
+    light.distance = options.lighting[name].distance;
+    light.position.x = options.lighting[name].position.x;
+    light.position.y = options.lighting[name].position.y;
+    light.position.z = options.lighting[name].position.z;
+    
+    light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024;
+    light.shadow.camera.near = 10;
+    light.shadow.camera.far = 200;
+    scene.add(light);
+}
+
 function initLights() {
     // Ambient
-    if (!ambientLight) {
-        ambientLight = new THREE.AmbientLight();
-    }
+    ambientLight = new THREE.AmbientLight();
     ambientLight.color = new THREE.Color(options.lighting.ambient.color);
     ambientLight.intensity = options.lighting.ambient.intensity;
     scene.add(ambientLight);
 
     // Primary Spotlight
-    if (!spotlightPrimary) {
-        spotlightPrimary = new THREE.SpotLight();
-    }
-    spotlightPrimary.color = new THREE.Color(options.lighting.primary.color);
-    spotlightPrimary.intensity = options.lighting.primary.intensity;
-    spotlightPrimary.angle = options.lighting.primary.angle;
-    spotlightPrimary.penumbra = options.lighting.primary.penumbra;
-    spotlightPrimary.decay = options.lighting.primary.decay;
-    spotlightPrimary.distance = options.lighting.primary.distance;
-    spotlightPrimary.position.x = options.lighting.primary.position.x;
-    spotlightPrimary.position.y = options.lighting.primary.position.y;
-    spotlightPrimary.position.z = options.lighting.primary.position.z;
-    
-
-    spotlightPrimary.castShadow = true;
-    spotlightPrimary.shadow.mapSize.width = 1024;
-    spotlightPrimary.shadow.mapSize.height = 1024;
-    spotlightPrimary.shadow.camera.near = 10;
-    spotlightPrimary.shadow.camera.far = 200;
-    scene.add(spotlightPrimary);
+    spotlightPrimary = new THREE.SpotLight();
+    createLight(spotlightPrimary, 'primary');
 
     // Secondary Spotlight
-    if (!spotlightSecondary) {
-        spotlightSecondary = new THREE.SpotLight();
-    }
-    spotlightSecondary.color = new THREE.Color(options.lighting.secondary.color);
-    spotlightSecondary.intensity = options.lighting.secondary.intensity;
-    spotlightSecondary.angle = options.lighting.secondary.angle;
-    spotlightSecondary.penumbra = options.lighting.secondary.penumbra;
-    spotlightSecondary.decay = options.lighting.secondary.decay;
-    spotlightSecondary.distance = options.lighting.secondary.distance;
-    spotlightSecondary.position.x = options.lighting.secondary.position.x;
-    spotlightSecondary.position.y = options.lighting.secondary.position.y;
-    spotlightSecondary.position.z = options.lighting.secondary.position.z;
-
-    spotlightSecondary.castShadow = true;
-    spotlightSecondary.shadow.mapSize.width = 1024;
-    spotlightSecondary.shadow.mapSize.height = 1024;
-    spotlightSecondary.shadow.camera.near = 10;
-    spotlightSecondary.shadow.camera.far = 200;
-    scene.add(spotlightSecondary);
+    spotlightSecondary = new THREE.SpotLight();
+    createLight(spotlightSecondary, 'secondary');
 }
 
 function initGui() {
     var gui = new dat.GUI();
 
+    // Begin general
     var _fGeneral = gui.addFolder('General');
     _fGeneral.addColor(options.general, 'backgroundColor').onChange(function (value) { scene.background.set(value); });
     _fGeneral.addColor(options.general, 'fogColor').onChange(function (value) { scene.fog.color.set(value); });
@@ -912,6 +890,7 @@ function initGui() {
         'georgentor.png',
         'vondelpark.png',
     ]).onChange((value) => { loadEnvironmentMap(value); });
+    // End general
 
     // Begin post-processing
     var _fPostProcessing = gui.addFolder('Post-processing');
@@ -956,6 +935,7 @@ function initGui() {
     _fModelPosition.add(options.model.position, 'x').min(-10).max(10).onChange((value) => { this.statue.position.x = value; });
     _fModelPosition.add(options.model.position, 'y').min(-10).max(10).onChange((value) => { this.statue.position.y = value; });
     _fModelPosition.add(options.model.position, 'z').min(-10).max(10).onChange((value) => { this.statue.position.z = value; });
+
     const _fModelRotation = _fModel.addFolder('Rotation');
     // TODO: make these rotate decals as well
     _fModelRotation.add(options.model.rotation, 'x').min(-10).max(10).onChange((value) => { this.statue.rotation.x = value; });
@@ -1023,10 +1003,11 @@ function initGui() {
     _fSpotlightPrimary.add(options.lighting.primary, 'angle', 0, Math.PI / 3).onChange(function (val) { spotlightPrimary.angle = val; });
     _fSpotlightPrimary.add(options.lighting.primary, 'penumbra', 0, 1).onChange(function (val) { spotlightPrimary.penumbra = val; });
     _fSpotlightPrimary.add(options.lighting.primary, 'decay', 1, 2).onChange(function (val) { spotlightPrimary.decay = val });
+    
     const _fSpotlightPrimaryPosition = _fSpotlightPrimary.addFolder('Position');
-    _fSpotlightPrimaryPosition.add(options.lighting.primary.position, 'x').min(-10).max(10).onChange((value) => { this.spotlightPrimary.position.x = value; });
-    _fSpotlightPrimaryPosition.add(options.lighting.primary.position, 'y').min(-10).max(10).onChange((value) => { this.spotlightPrimary.position.y = value; });
-    _fSpotlightPrimaryPosition.add(options.lighting.primary.position, 'z').min(-10).max(10).onChange((value) => { this.spotlightPrimary.position.z = value; });
+    _fSpotlightPrimaryPosition.add(options.lighting.primary.position, 'x').min(-10).max(10).onChange((value) => { spotlightPrimary.position.x = value; });
+    _fSpotlightPrimaryPosition.add(options.lighting.primary.position, 'y').min(-10).max(10).onChange((value) => { spotlightPrimary.position.y = value; });
+    _fSpotlightPrimaryPosition.add(options.lighting.primary.position, 'z').min(-10).max(10).onChange((value) => { spotlightPrimary.position.z = value; });
     // End Spotlight Primary
 
     // Begin Spotlight Secondary
@@ -1037,10 +1018,11 @@ function initGui() {
     _fSpotlightSecondary.add(options.lighting.secondary, 'angle', 0, Math.PI / 3).onChange(function (val) { spotlightSecondary.angle = val; });
     _fSpotlightSecondary.add(options.lighting.secondary, 'penumbra', 0, 1).onChange(function (val) { spotlightSecondary.penumbra = val; });
     _fSpotlightSecondary.add(options.lighting.secondary, 'decay', 1, 2).onChange(function (val) { spotlightSecondary.decay = val; });
+
     const _fSpotlightSecondaryPosition = _fSpotlightSecondary.addFolder('Position');
-    _fSpotlightSecondaryPosition.add(options.lighting.secondary.position, 'x').min(-10).max(10).onChange((value) => { this.spotlightSecondary.position.x = value; });
-    _fSpotlightSecondaryPosition.add(options.lighting.secondary.position, 'y').min(-10).max(10).onChange((value) => { this.spotlightSecondary.position.y = value; });
-    _fSpotlightSecondaryPosition.add(options.lighting.secondary.position, 'z').min(-10).max(10).onChange((value) => { this.spotlightSecondary.position.z = value; });
+    _fSpotlightSecondaryPosition.add(options.lighting.secondary.position, 'x').min(-10).max(10).onChange((value) => { spotlightSecondary.position.x = value; });
+    _fSpotlightSecondaryPosition.add(options.lighting.secondary.position, 'y').min(-10).max(10).onChange((value) => { spotlightSecondary.position.y = value; });
+    _fSpotlightSecondaryPosition.add(options.lighting.secondary.position, 'z').min(-10).max(10).onChange((value) => { spotlightSecondary.position.z = value; });
     // End Spotlight Secondary
 }
 
