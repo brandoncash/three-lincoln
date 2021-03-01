@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "serve": "^11.3.0",
-    "three": "^0.102.1"
+    "three": "^0.125.0"
   }
 }
